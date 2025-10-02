@@ -4,6 +4,11 @@
 **Structure:** 4 tables
 **Period**: Setiap baris di dataset konteksnya adalah 1 tahun
 
+## ERD Diagram
+![[alt]](https://github.com/najeep24/credit-default-risk-analysis/blob/d1ead5aa18142e3cd18b67009e88e029a5829a36/data/ERD_capital_analysis.jpg)
+
+Entity relationship diagram memperlihatkan relasi one to one untuk semua tabel yang ada, jadi bisa diasumsikan kita tinggal melakukan **left join** saja dan sudah bisa menggabungkan keseluruhan dataset tanpa masalah. ini akan mempermudah analisa khususnya EDA. Jika ada indikasi variabel gabungan yang menarik, maka akan dilakukan feature engineering.
+
 ## `company_info.csv`
 | Variable               | Type          | Description (Business Meaning)                                                                                                             |
 | ---------------------- | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
