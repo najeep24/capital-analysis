@@ -1,47 +1,71 @@
-# Dataset Dictionary
+Dataset ini berisi data historis perusahaan dari berbagai sektor industri yang mengajukan pembiayaan ke lembaga keuangan.  
+Tujuannya adalah untuk memahami faktor-faktor yang memengaruhi kemungkinan terjadinya **kredit bermasalah (default)** berdasarkan profil keuangan, aktivitas pinjaman, serta kondisi ekonomi makro.
 
-**Dataset:** 50,000 Indonesian corporate borrowers  
-**Structure:** 4 tables
-**Period**: Setiap baris di dataset konteksnya adalah 1 tahun
-
-## ERD Diagram
-![[alt]](https://github.com/najeep24/credit-default-risk-analysis/blob/d1ead5aa18142e3cd18b67009e88e029a5829a36/data/ERD_capital_analysis.jpg)
-
-Entity relationship diagram memperlihatkan relasi one to one untuk semua tabel yang ada, jadi bisa diasumsikan kita tinggal melakukan **left join** saja dan sudah bisa menggabungkan keseluruhan dataset tanpa masalah. ini akan mempermudah analisa khususnya EDA. Jika ada indikasi variabel gabungan yang menarik, maka akan dilakukan feature engineering.
+Data dikumpulkan dari beberapa sumber internal dan eksternal, termasuk informasi perusahaan, laporan keuangan, histori pinjaman, dan indikator ekonomi nasional.  
+Setiap tabel mewakili sumber data berbeda yang saling terhubung melalui `company_id` dan tahun laporan.
 
 ## `company_info.csv`
-| Variable               | Type          | Description (Business Meaning)                                                                                                             |
-| ---------------------- | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| **company_id**         | String (UUID) | ID unik untuk setiap perusahaan, digunakan untuk menghubungkan semua tabel.                                                                |
-| **company_name**       | String        | Nama perusahaan (legal name) sesuai registrasi di Indonesia.                                                                               |
-| **sector**             | Categorical   | Sektor industri tempat perusahaan beroperasi (contoh: manufaktur, konstruksi, teknologi). Penting untuk membandingkan risiko antar sektor. |
-| **years_in_operation** | Integer       | Umur perusahaan (berapa tahun sudah berjalan).                                                                                             |
-| **audited_financials** | Binary        | Apakah laporan keuangan sudah diaudit. Audit meningkatkan kredibilitas dan kepercayaan pemberi pinjaman.                                   |
-| **ownership_type**     | Categorical   | Jenis kepemilikan (contoh: swasta, BUMN, asing). Penting karena profil risiko bisa berbeda antar jenis kepemilikan.                        |
+
+Berisi profil dasar setiap perusahaan, termasuk sektor, jenis kepemilikan, lama beroperasi, dan status audit laporan keuangan.
+
+| Column               | Type                         | Description                                                                                         |
+| :------------------- | :--------------------------- | :-------------------------------------------------------------------------------------------------- |
+| `company_id`         | string                       | Unique identifier untuk setiap perusahaan.                                                          |
+| `company_name`       | string                       | Nama perusahaan (kadang tidak konsisten / typo).                                                    |
+| `sector`             | string                       | Sektor industri perusahaan, misal: Manufacturing, Trade, Services, Tech, Construction, Agriculture. |
+| `ownership_type`     | string                       | Jenis kepemilikan: Private, Public, State-Owned (kadang case tidak konsisten).                      |
+| `years_in_operation` | int                          | Lama perusahaan beroperasi dalam tahun.                                                             |
+| `audited_financials` | binary (0/1 atau “Yes”/“No”) | Menunjukkan apakah laporan keuangan telah diaudit.                                                  |
+| `audit_flag`         | binary                       | Flag audit tambahan, dihasilkan dari kolom sebelumnya.                                              |
+| `sector_risk`        | float                        | Skor risiko sektor (0–1) dari data lookup sektor.                                                   |
+| `default_flag`       | binary                       | Label target (0 = non-default, 1 = default). Ground truth untuk modeling.                           |
+
 
 ## `financials.csv`
 
-| Variable              | Type   | Description (Business Meaning)                                                                                             |
-| --------------------- | ------ | -------------------------------------------------------------------------------------------------------------------------- |
-| **company_id**        | String | Kunci penghubung ke tabel profil perusahaan.                                                                               |
-| **annual_revenue**    | Float  | Pendapatan tahunan perusahaan. Semakin tinggi, semakin besar kapasitas bayar.                                              |
-| **net_profit_margin** | Float  | Persentase laba bersih dibanding pendapatan. Mengukur efisiensi & profitabilitas. Margin negatif = indikasi risiko tinggi. |
-| **total_assets**      | Float  | Total aset yang dimiliki perusahaan (tanah, bangunan, mesin, kas). Indikator ukuran perusahaan.                            |
-| **total_liabilities** | Float  | Total kewajiban/hutang perusahaan. Rasio hutang tinggi = risiko gagal bayar lebih tinggi.                                  |
-| **equity**            | Float  | Selisih aset dengan kewajiban. Equity negatif menandakan kondisi keuangan kritis.                                          |
-| **cash_ratio**        | Float  | Likuiditas jangka pendek (kas ÷ kewajiban lancar). Menunjukkan kemampuan perusahaan membayar kewajiban segera.             |
+Memuat data laporan keuangan tahunan, seperti pendapatan, aset, kewajiban, ekuitas, margin laba, serta rasio-rasio finansial utama.
 
-## `credit_history.csv`
-| Variable               | Type    | Description (Business Meaning)                                                                                                       |
-| ---------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| **company_id**         | String  | Kunci penghubung ke tabel profil perusahaan.                                                                                         |
-| **existing_loans**     | Integer | Jumlah pinjaman aktif yang dimiliki. Terlalu banyak pinjaman bisa meningkatkan risiko kredit macet.                                  |
-| **past_due_days**      | Integer | Jumlah hari keterlambatan pembayaran terlama dalam 12 bulan terakhir. Semakin lama keterlambatan, semakin tinggi risiko gagal bayar. |
-| **credit_utilization** | Float   | Persentase pemakaian plafon kredit (0–100%+). Kredit terpakai di atas 90% atau melebihi limit = tanda tekanan keuangan.              |
-## `macro_context`
-| Variable                    | Type   | Description (Business Meaning)                                                                                          |
-| --------------------------- | ------ | ----------------------------------------------------------------------------------------------------------------------- |
-| **company_id**              | String | Kunci penghubung ke tabel profil perusahaan.                                                                            |
-| **sector_avg_default_rate** | Float  | Rata-rata tingkat gagal bayar di sektor tersebut. Sebagai baseline risiko sektor.                                       |
-| **gdp_growth**              | Float  | Pertumbuhan ekonomi Indonesia. Pertumbuhan rendah → tekanan pada semua sektor. Pertumbuhan tinggi → peluang lebih baik. |
-| **inflation**               | Float  | Tingkat inflasi nasional. Inflasi tinggi menekan margin perusahaan karena biaya meningkat.                              |
+| Column               | Type         | Description                                                                                           |
+| :------------------- | :----------- | :---------------------------------------------------------------------------------------------------- |
+| `company_id`         | string       | Foreign key mengacu ke `company_info_raw`.                                                            |
+| `year`               | int          | Tahun laporan (2022 atau 2023).                                                                       |
+| `annual_revenue`     | string/float | Pendapatan tahunan (bercampur IDR dan USD, dengan format bervariasi seperti “4.5M”, “2 million USD”). |
+| `total_assets`       | string/float | Total aset perusahaan.                                                                                |
+| `total_liabilities`  | string/float | Total kewajiban perusahaan.                                                                           |
+| `equity`             | string/float | Modal sendiri (assets - liabilities). Bisa negatif untuk perusahaan rugi.                             |
+| `net_profit_margin`  | float        | Rasio profit margin bersih (%).                                                                       |
+| `cash_ratio`         | float        | Rasio kas terhadap kewajiban jangka pendek.                                                           |
+
+## `loan_history.csv`
+Menyajikan histori pinjaman perusahaan, mencakup jumlah pinjaman aktif, beban kredit dan keterlambatan pembayaran.
+
+| Column               | Type   | Description                                                               |
+| :------------------- | :----- | :------------------------------------------------------------------------ |
+| `company_id`         | string | Foreign key ke `company_info_raw`.                                        |
+| `existing_loans`     | int    | Jumlah pinjaman aktif.                                                    |
+| `loan_amount`        | float  | Total nominal pinjaman aktif.                                             |
+| `past_due_days`      | int    | Jumlah hari keterlambatan pembayaran terakhir.                            |
+| `loan_burden`        | float  | Proporsi beban pinjaman terhadap aset.                                    |
+| `credit_utilization` | float  | Persentase penggunaan kredit terhadap limit.                              |
+
+
+## `macro_economics`
+Berisi indikator ekonomi makro tahunan seperti pertumbuhan GDP, inflasi, dan indeks guncangan ekonomi (_macro shock_).
+
+| Column        | Type  | Description                           |
+| :------------ | :---- | :------------------------------------ |
+| `year`        | int   | Tahun data makro ekonomi (2022–2023). |
+| `gdp_growth`  | float | Pertumbuhan GDP nasional (%).         |
+| `inflation`   | float | Inflasi tahunan (%).                  |
+| `macro_shock` | float | Indeks kejutan ekonomi (0–1).         |
+
+## `sector_lookup`
+Menyediakan lookup table sektor industri beserta rata-rata tingkat gagal bayar dan skor risiko sektoral untuk konteks analisis.
+
+|Column|Type|Description|
+|:--|:--|:--|
+|`sector`|string|Nama sektor industri.|
+|`sector_avg_default_rate`|float|Rata-rata tingkat gagal bayar di sektor tersebut.|
+|`sector_risk`|float|Skor risiko sektoral (semakin tinggi = lebih berisiko).|
+
+
