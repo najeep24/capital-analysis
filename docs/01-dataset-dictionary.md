@@ -1,3 +1,4 @@
+# Dataset Dictionary
 Dataset ini berisi data historis perusahaan dari berbagai sektor industri yang mengajukan pembiayaan ke lembaga keuangan.  
 Tujuannya adalah untuk memahami faktor-faktor yang memengaruhi kemungkinan terjadinya **kredit bermasalah (default)** berdasarkan profil keuangan, aktivitas pinjaman, serta kondisi ekonomi makro.
 
