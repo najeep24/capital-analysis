@@ -1,35 +1,28 @@
-### **Project Background :**
+    
+## Problem Definition
 
-Lembaga keuangan dan bank menghadapi tantangan dalam menilai kelayakan kredit perusahaan.
+### Project Background
 
-- **Manual assessment masih dominan** → banyak lembaga masih menggunakan laporan keuangan manual atau penilaian subjektif analis. Hal ini rawan bias dan lambat.
-- **Risiko gagal bayar akan tinggi** → tanpa sistem prediksi yang tepat, bank bisa memberi pinjaman pada perusahaan yang berpotensi gagal bayar. Akibatnya: kerugian finansial besar dan meningkatnya angka NPL (Non-Performing Loan).
-- **Data tidak terintegrasi** → informasi tentang perusahaan tidak hanya ada di laporan keuangan, tetapi juga pada riwayat kredit dan kondisi makro. Banyak lembaga tidak mampu menggabungkan ini dengan baik.
-- **Regulasi makin ketat** → otoritas keuangan menuntut transparansi dalam pengelolaan risiko kredit. Tanpa sistem yang berbasis data, bank sulit memenuhi compliance.
+The client company currently relies on manual financial statement analysis to evaluate borrower feasibility for working capital loans. This traditional approach is time-consuming, prone to human error, and limits the speed of decision-making. Financial analysts must manually calculate numerous financial ratios, analyze trends across multiple periods, and cross-reference various financial metrics before reaching a creditworthiness decision. This manual process creates bottlenecks in the loan approval workflow and increases operational costs.
 
----
+### Problem Statement
 
-### **Problem Statement:**
+The organization lacks an automated, systematic approach to assess borrower feasibility based on comprehensive financial statement analysis. Key challenges include:
 
-Bagaimana membangun model prediktif yang dapat menilai kemungkinan suatu perusahaan mengalami default (default_flag = 1) dengan memanfaatkan data profil perusahaan, kondisi finansial, riwayat kredit, serta faktor makroekonomi?
+- **Manual Processing**: Financial analysis is conducted manually for each applicant, requiring significant time and resources
+- **Inconsistency**: Different analysts may apply varying judgment criteria, leading to inconsistent decisions
+- **Scalability**: Current processes cannot efficiently handle large volumes of borrower applications
+- **Decision Delays**: The time required for feasibility assessment delays loan approval decisions
+- **Limited Visibility**: Stakeholders lack real-time insights into the key financial health indicators
 
----
+### Solution
 
-### **Solution :**
+This project automates the financial feasibility assessment process by implementing:
 
-Sebagai penawar dari masalah di atas, pendekatannya adalah **membangun Credit Risk Scoring Model berbasis data science**:
+- **Automated Financial Analysis**: Systematic calculation of financial ratios (liquidity, solvency, profitability, efficiency) from raw financial statements
+- **Decision Rules Engine**: Pre-defined decision rules and thresholds to classify borrowers as "Feasible", "Conditional", or "Not Feasible"
+- **Predictive Modeling**: Machine learning models to predict creditworthiness and risk levels
+- **Interactive Dashboard**: Visual analytics dashboard providing key metrics, trend analysis, and decision support
+- **Integrated Reporting**: Comprehensive reports combining quantitative analysis with visual representations
 
-1. **EDA (Exploratory Data Analysis)** → untuk memahami pola distribusi, missing values, dan outlier. Ini mengurangi blind spot dalam pengambilan keputusan.
-2. **Bangun Machine Learning Classification Model**:
-    - Logistic Regression untuk baseline yang interpretable.
-    - Random Forest / XGBoost untuk akurasi tinggi dan menangkap non-linearitas.
-    - Model ini otomatis **menggabungkan data internal (financials, credit history) dan eksternal (macro context)**.
-3. **Gunakan Feature Importance & SHAP values** → memberikan transparansi (explainability) ke manajemen & regulator, sehingga mereka tahu faktor utama penyebab default (misal: debt-to-equity tinggi, utilisasi kredit berlebihan, atau sektor dengan risiko makro tinggi).
-4. **Validasi Model dengan AUC & F1-score** → memastikan model tidak hanya akurat, tetapi juga seimbang dalam menangani data imbalanced (default vs non-default).
-5. **Risk Segmentation (High, Medium, Low Risk)** → hasil model dipakai untuk:
-    - **Penawar utama:** mengurangi kerugian kredit macet (karena pinjaman bisa difokuskan ke perusahaan dengan risiko rendah/terkelola).
-    - Mempercepat proses approval kredit (otomatisasi keputusan kredit).
-    - Meningkatkan trust regulator karena scoring berbasis data yang jelas dan explainable.
-
-
-
+**Outcome**: Faster, more accurate, and consistent borrower feasibility assessments with improved decision support for credit officers.
